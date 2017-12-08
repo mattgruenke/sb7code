@@ -60,6 +60,7 @@ set(RUN_DIR ${PROJECT_BINARY_DIR}/bin)
 
     # Examples that have been ported to oglplus.
 set(EXAMPLES_PLUS
+  singletri
 )
 
     # Examples still using sb7, only.
@@ -131,7 +132,6 @@ set(EXAMPLES
   simpletexcoords
   simpletexture
   singlepoint
-  singletri
   sparsetexture
   spinnycube
   springmass
