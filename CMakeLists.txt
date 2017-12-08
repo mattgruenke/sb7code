@@ -28,7 +28,7 @@ if(WIN32)
 elseif (UNIX)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GLFW REQUIRED glfw3)
-    set(COMMON_LIBS sb7 glfw X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL rt dl)
+    set(COMMON_LIBS sb7 ${GLFW_LIBRARIES} X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL rt dl)
 else()
     set(COMMON_LIBS sb7)
 endif()
@@ -174,7 +174,6 @@ ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     # Adding src enables including src/oglplus/example.hpp as just "oglplus/example.hpp".
 include_directories( include src )
-#include_directories(extern/glfw-3.0.4/include)
 include_directories(${OGLPLUS_INCLUDE_DIRS})
 
 ADD_CUSTOM_TARGET(debug ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Debug ${PROJECT_SOURCE_DIR})
