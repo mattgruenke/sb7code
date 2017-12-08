@@ -17,7 +17,9 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 find_package(OpenGL)
+find_package(OGLplus REQUIRED)
 
 set (CMAKE_DEBUG_POSTFIX "_d")
 
@@ -43,8 +45,24 @@ add_library(sb7
             src/sb7/gl3w.c
 )
 
+    # Example framework copied from oglplus, since it's not normally installed.
+    #  Opted against putting this in extern/, since that seems to contain entire
+    #  snapshots of external libraries, while these are just a few internal files.
+add_library(oglplus_example
+            src/oglplus/example/glfw3_main.cpp
+)
+
+    # For simplicity, we only support glfw3_main.  However, the oglplus source tree
+    #  also contains support for: glfw1, egl, glut, glx, qt4gl, qt5gl, sdl, and wxgl.
+target_link_libraries(oglplus_example ${GLFW_LIBRARIES})
+
 set(RUN_DIR ${PROJECT_BINARY_DIR}/bin)
 
+    # Examples that have been ported to oglplus.
+set(EXAMPLES_PLUS
+)
+
+    # Examples still using sb7, only.
 set(EXAMPLES
   alienrain
   basicfbo
@@ -137,7 +155,7 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-foreach(EXAMPLE ${EXAMPLES})
+foreach(EXAMPLE ${EXAMPLES} ${EXAMPLES_PLUS})
   add_executable(${EXAMPLE} WIN32 src/${EXAMPLE}/${EXAMPLE}.cpp)
   set_property(TARGET ${EXAMPLE} PROPERTY DEBUG_POSTFIX _d)
   target_link_libraries(${EXAMPLE} ${COMMON_LIBS})
@@ -146,12 +164,18 @@ foreach(EXAMPLE ${EXAMPLES})
   endif(MSVC)
 endforeach(EXAMPLE)
 
+foreach(EXAMPLE ${EXAMPLES_PLUS})
+  target_link_libraries(${EXAMPLE} oglplus_example)
+endforeach(EXAMPLE)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-D_LINUX)
 ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-include_directories( include )
+    # Adding src enables including src/oglplus/example.hpp as just "oglplus/example.hpp".
+include_directories( include src )
 #include_directories(extern/glfw-3.0.4/include)
+include_directories(${OGLPLUS_INCLUDE_DIRS})
 
 ADD_CUSTOM_TARGET(debug ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Debug ${PROJECT_SOURCE_DIR})
 ADD_CUSTOM_TARGET(release ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Release ${PROJECT_SOURCE_DIR})
