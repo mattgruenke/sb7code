@@ -21,20 +21,17 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <sb7.h>
+#include <oglplus/gl.hpp>
+#include <oglplus/all.hpp>
+#include "oglplus/example.hpp"
 
-class singlepoint_app : public sb7::application
+using namespace oglplus;
+
+
+class singlepoint_app : public Example
 {
-    void init()
-    {
-        static const char title[] = "OpenGL SuperBible - Single Point";
-
-        sb7::application::init();
-
-        memcpy(info.title, title, sizeof(title));
-    }
-
-    virtual void startup()
+public:
+    singlepoint_app()
     {
         static const char * vs_source[] =
         {
@@ -58,45 +55,50 @@ class singlepoint_app : public sb7::application
             "}                                             \n"
         };
 
-        program = glCreateProgram();
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, fs_source, NULL);
-        glCompileShader(fs);
+        FragmentShader  fs;
+        fs.Source(fs_source).Compile();
 
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, vs_source, NULL);
-        glCompileShader(vs);
+        VertexShader    vs;
+        vs.Source(vs_source).Compile();
 
-        glAttachShader(program, vs);
-        glAttachShader(program, fs);
+        program.AttachShader(vs);
+        program.AttachShader(fs);
 
-        glLinkProgram(program);
+        program.Link().Use();
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        vao.Bind();
     }
 
-    virtual void render(double currentTime)
+    void Reshape(GLuint width, GLuint height)
+    {
+        gl.Viewport(width, height);
+    }
+
+    virtual void Render(double currentTime)
     {
         static const GLfloat red[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, red);
+        gl.ClearColorBuffer(0, red);
 
-        glUseProgram(program);
+        gl.PointSize(40.0f);
 
-        glPointSize(40.0f);
-
-        glDrawArrays(GL_POINTS, 0, 1);
-    }
-
-    virtual void shutdown()
-    {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteProgram(program);
+        gl.DrawArrays(PrimitiveType::Points, 0, 3);
     }
 
 private:
-    GLuint          program;
-    GLuint          vao;
+    Context         gl;
+    Program         program;
+    VertexArray     vao;
 };
 
-DECLARE_MAIN(singlepoint_app)
+
+const char *oglplus::title = "OpenGL SuperBible - Single Point";
+
+void oglplus::setupExample(ExampleParams &)
+{
+}
+
+std::unique_ptr<Example> oglplus::makeExample(const ExampleParams &)
+{
+    return std::unique_ptr<Example>(new singlepoint_app);
+}
+
