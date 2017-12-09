@@ -60,6 +60,7 @@ set(RUN_DIR ${PROJECT_BINARY_DIR}/bin)
 
     # Examples that have been ported to oglplus.
 set(EXAMPLES_PLUS
+  simpleclear
   singlepoint
   singletri
 )
@@ -129,7 +130,6 @@ set(EXAMPLES
   sdfdemo
   shadowmapping
   shapedpoints
-  simpleclear
   simpletexcoords
   simpletexture
   sparsetexture

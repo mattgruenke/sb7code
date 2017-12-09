@@ -21,24 +21,39 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <sb7.h>
+#include <oglplus/gl.hpp>
+#include <oglplus/all.hpp>
+#include "oglplus/example.hpp"
 
-class simpleclear_app : public sb7::application
+using namespace oglplus;
+
+class simpleclear_app : public Example
 {
-    void init()
+public:
+    void Reshape(GLuint width, GLuint height)
     {
-        static const char title[] = "OpenGL SuperBible - Simple Clear";
-
-        sb7::application::init();
-
-        memcpy(info.title, title, sizeof(title));
+        gl.Viewport(width, height);
     }
 
-    virtual void render(double currentTime)
+    virtual void Render(double currentTime)
     {
         static const GLfloat red[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, red);
+        gl.ClearColorBuffer(0, red);
     }
+
+private:
+    Context         gl;
 };
 
-DECLARE_MAIN(simpleclear_app)
+
+const char *oglplus::title = "OpenGL SuperBible - Simple Clear";
+
+void oglplus::setupExample(ExampleParams &)
+{
+}
+
+std::unique_ptr<Example> oglplus::makeExample(const ExampleParams &)
+{
+    return std::unique_ptr<Example>(new simpleclear_app);
+}
+
