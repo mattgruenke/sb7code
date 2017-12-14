@@ -107,6 +107,8 @@ void run_loop(
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		if(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_RELEASE) break;
+		if(glfwWindowShouldClose(window) == GL_TRUE) break;
 
 		int new_x, new_y;
 		double tmp_x, tmp_y;

@@ -268,7 +268,7 @@ public:
 	 */
 	virtual bool Continue(double duration)
 	{
-		return duration < 3.0; // [seconds]
+		return true;
 	}
 
 	/// Hint for the main function whether to continue rendering
