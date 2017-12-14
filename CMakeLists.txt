@@ -60,6 +60,7 @@ set(RUN_DIR ${PROJECT_BINARY_DIR}/bin)
 
     # Examples that have been ported to oglplus.
 set(EXAMPLES_PLUS
+  movingtri
   simpleclear
   singlepoint
   singletri
@@ -105,7 +106,6 @@ set(EXAMPLES
   ktxview
   linesmooth
   mirrorclampedge
-  movingtri
   msaanative
   multidrawindirect
   multiscissor
