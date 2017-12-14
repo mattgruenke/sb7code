@@ -67,7 +67,8 @@ public:
         vs.Source(vs_source).Compile();
 
         // attach the shaders to the program
-        program.AttachShader(vs).AttachShader(fs);
+        program.AttachShader(vs);
+        program.AttachShader(fs);
 
         // link and use it
         program.Link().Use();
