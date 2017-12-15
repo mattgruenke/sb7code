@@ -21,20 +21,18 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <sb7.h>
+#include <oglplus/gl.hpp>
+#include <oglplus/all.hpp>
+#include "oglplus/example.hpp"
 
-class tessellatedtri_app : public sb7::application
+
+using namespace oglplus;
+
+
+class tessellatedtri_app : public Example
 {
-    void init()
-    {
-        static const char title[] = "OpenGL SuperBible - Tessellated Triangle";
-
-        sb7::application::init();
-
-        memcpy(info.title, title, sizeof(title));
-    }
-
-    virtual void startup()
+public:
+    tessellatedtri_app()
     {
         static const char * vs_source[] =
         {
@@ -95,54 +93,60 @@ class tessellatedtri_app : public sb7::application
             "}                                                                 \n"
         };
 
-        program = glCreateProgram();
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, vs_source, NULL);
-        glCompileShader(vs);
+        VertexShader vs;
+        vs.Source(vs_source).Compile();
 
-        GLuint tcs = glCreateShader(GL_TESS_CONTROL_SHADER);
-        glShaderSource(tcs, 1, tcs_source, NULL);
-        glCompileShader(tcs);
+        TessControlShader tcs;
+        tcs.Source(tcs_source).Compile();
 
-        GLuint tes = glCreateShader(GL_TESS_EVALUATION_SHADER);
-        glShaderSource(tes, 1, tes_source, NULL);
-        glCompileShader(tes);
+        TessEvaluationShader tes;
+        tes.Source(tes_source).Compile();
 
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, fs_source, NULL);
-        glCompileShader(fs);
+        FragmentShader fs;
+        fs.Source(fs_source).Compile();
 
-        glAttachShader(program, vs);
-        glAttachShader(program, tcs);
-        glAttachShader(program, tes);
-        glAttachShader(program, fs);
+        program.AttachShader(vs);
+        program.AttachShader(tcs);
+        program.AttachShader(tes);
+        program.AttachShader(fs);
 
-        glLinkProgram(program);
+        program.Link().Use();
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        vao.Bind();
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        gl.PolygonMode(PolygonMode::Line);
     }
 
-    virtual void render(double currentTime)
+    virtual void Reshape(GLuint width, GLuint height)
+    {
+        gl.Viewport(width, height);
+    }
+
+    virtual void Render(double currentTime)
     {
         static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, green);
+        gl.ClearColorBuffer(0, green);
 
-        glUseProgram(program);
-        glDrawArrays(GL_PATCHES, 0, 3);
-    }
-
-    virtual void shutdown()
-    {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteProgram(program);
+        gl.DrawArrays(PrimitiveType::Patches, 0, 3);
     }
 
 private:
-    GLuint          program;
-    GLuint          vao;
+    Context         gl;
+    Program         program;
+    VertexArray     vao;
 };
 
-DECLARE_MAIN(tessellatedtri_app)
+
+const char *oglplus::title = "OpenGL SuperBible - Tessellated Triangle";
+
+
+void oglplus::setupExample(ExampleParams &)
+{
+}
+
+
+std::unique_ptr<Example> oglplus::makeExample(const ExampleParams &)
+{
+    return std::unique_ptr<Example>(new tessellatedtri_app);
+}
+

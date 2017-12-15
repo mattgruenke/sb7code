@@ -64,6 +64,7 @@ set(EXAMPLES_PLUS
   simpleclear
   singlepoint
   singletri
+  tessellatedtri
 )
 
     # Examples still using sb7, only.
@@ -141,7 +142,6 @@ set(EXAMPLES
   subroutines
   tessellatedcube
   tessellatedgstri
-  tessellatedtri
   tessmodes
   tesssubdivmodes
   toonshading
