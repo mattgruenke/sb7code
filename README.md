@@ -13,12 +13,12 @@ most OpenGL projects.
 
 For the original example source, see:
 
-    https://github.com/openglsuperbible/sb7code
+> https://github.com/openglsuperbible/sb7code
 
 For more on OGLplus (warning: the online doxygen docs are currently
 out-of-date), see:
 
-    http://oglplus.org
+> http://oglplus.org
 
 
 ## Changes & Differences ##
@@ -31,19 +31,19 @@ non-critical errors I've not addressed.
 The fixes I *have* applied are mostly from pull-requests submitted (but not
 applied) to the original project:
 
-    * https://github.com/openglsuperbible/sb7code/pull/5
-    * https://github.com/openglsuperbible/sb7code/pull/7
+* https://github.com/openglsuperbible/sb7code/pull/5
+* https://github.com/openglsuperbible/sb7code/pull/7
 
 Other changes include:
 
-    * Changed output directory of example programs from being relative to the
-      CMAKE_SOURCE_DIR to being in CMAKE_BINARY_DIR.
-    * Removed extern/glfw-3.0.4/ - users are now responsible for providing glfw3.
-    * Removing Khronos header files, in order to ensure system-supplied versions
-      are used instead.
-    * CMake cleanup: Changed project name, enabled C++11 using the proper method.
-    * Added snapshot of internal files from oglplus-0.71.0 needed to build its
-      examples & borrowed to build the OGLplus ports of the SB7 examples.
+* Changed output directory of example programs from being relative to the
+  CMAKE_SOURCE_DIR to being in CMAKE_BINARY_DIR.
+* Removed extern/glfw-3.0.4/ - users are now responsible for providing glfw3.
+* Removing Khronos header files, in order to ensure system-supplied versions
+  are used instead.
+* CMake cleanup: Changed project name, enabled C++11 using the proper method.
+* Added snapshot of internal files from oglplus-0.71.0 needed to build its
+  examples & borrowed to build the OGLplus ports of the SB7 examples.
 
 
 ## Building ##
