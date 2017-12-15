@@ -1,10 +1,9 @@
-OpenGL SuperBible 7th Edition Examples - How to Build
-=====================================================
+OGLplus port of OpenGL SuperBible 7th Edition Examples - How to Build
+=====================================================================
 
-This source code archive uses CMake to build. The samples also use GLFW library, a
-snapshot of which is included in the `extern` folder. It's also possible to use a different
-copy of GLFW if desired, but that's an excercise for you. Instructions for each supported
-platform are as follows:
+This source code archive uses CMake to build. The samples have been ported to use OGLplus,
+a modern C++ wrapper library for OpenGL.  They also use GLFW v3 library, both of which
+you must obtain separately.  Instructions for each supported platform are as follows:
 
 Windows / Microsoft Visual Studio 2013
 --------------------------------------
@@ -13,28 +12,36 @@ Install CMake. Windows binaries are available from http://www.cmake.org/.
 Ensure that CMake is in your path.
 Open a command prompt and change to the directory where you've checked out the code.
 
+### Obtain the latest Khhronos header files
+
+If they weren't supplied with the SDK for your GPU, the following should be
+available from khronos.org:
+
+* glcorearb.h
+* glext.h
+* wglext.h
+
 ### Build GLFW
 
-If you are going to use the copy of GLFW included in the archive, enter the
-GLFW directory in `extern/glfw-3.0.4`, and type:
-
-    cmake -G "Visual Studio 12" .
-
-(Yes, that's not a mistake - Visual Studio 12 is 2013)
-
-Open the resulting GLFW.sln file in Visual Studio and build both the debug and release configurations.
+Download/build/install glfw3.
 
 Copy and rename the resulting glfw3 libraries:
 
 * Copy `glfw-3.0.4/src/Debug/glfw3.lib` into the `lib` directory and **rename it to glfw3_d.lib**.
 * Copy `glf3-3.0.4/src/Release/glfw3.lib` into the `lib` directory but don't rename it.
 
+### Download OGLplus
+
+See http://oglplus.org for the latest version (note: OGLplu2 has a different &
+incompatible API).  While you may build it, it can also be used as a header-only
+library.
+
 ### Build the samples
 
 Open a command prompt and change to the build directory in the source archive.
 Type:
 
-    cmake -G "Visual Studio 12" ..
+    cmake -G "Visual Studio 12" .. -DCMAKE_PREFIX_PATH=<path-to-oglplus>
 
 Open the resulting superbible7.sln project in Visual Studio.
 
@@ -50,14 +57,16 @@ Debian-based distributions (such as Ubuntu and Mint):
     sudo apt-get install cmake
 
 You'll also need to satisfy dependencies. In particular, you'll need GL and
-GLX headers and libs (generally included in Mesa packages), and GLFW. You can use
-the a snapshot of GLFW included in the archive, if you wish, but pre-compiled
-packages should be available through package management on most distributions.
+GLX headers and libs (generally included in Mesa packages), and GLFW.
+
+Download OGLplus from http://oglplus.org (note: OGLplu2 has a different &
+incompatible API).  While you may build it, it can also be used as a header-only
+library.
 
 Once you have everything, you should enter the "build" directory in the source
 arvhive and issue:
 
-    cmake ..
+    cmake <path-to-sb7> -DCMAKE_PREFIX_PATH=<path-to-oglplus>
     make
 
 The examples will build into the 'bin' directory.
