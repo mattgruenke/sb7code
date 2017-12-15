@@ -30,6 +30,9 @@ Copy and rename the resulting glfw3 libraries:
 * Copy `glfw-3.0.4/src/Debug/glfw3.lib` into the `lib` directory and **rename it to glfw3_d.lib**.
 * Copy `glf3-3.0.4/src/Release/glfw3.lib` into the `lib` directory but don't rename it.
 
+Note that OGLplus has support for other frameworks.
+See <oglplus>/example/oglplus/*_main.cpp for alternatives.
+
 ### Download OGLplus
 
 See http://oglplus.org for the latest version (note: OGLplu2 has a different &
@@ -58,6 +61,9 @@ Debian-based distributions (such as Ubuntu and Mint):
 
 You'll also need to satisfy dependencies. In particular, you'll need GL and
 GLX headers and libs (generally included in Mesa packages), and GLFW.
+
+Note that OGLplus has support for other frameworks.
+See <oglplus>/example/oglplus/*_main.cpp for alternatives.
 
 Download OGLplus from http://oglplus.org (note: OGLplu2 has a different &
 incompatible API).  While you may build it, it can also be used as a header-only
