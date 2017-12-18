@@ -19,9 +19,16 @@ For more on OGLplus (warning: the online doxygen docs are currently
 out-of-date), see:
 
 > http://oglplus.org
+> https://github.com/matus-chochlik/oglplus
 
 
-## Changes & Differences ##
+## Porting Status ##
+
+For a list of files that have been ported, open CMakeLists.txt and see the
+`EXAMPLES_PLUS` variable.
+
+
+## Other Changes & Differences ##
 
 In porting these examples, I have taken care to change as little as possible.
 This was done primarily to facilitate a side-by-side comparison of how OGLplus
@@ -37,7 +44,7 @@ applied) to the original project:
 Other changes include:
 
 * Changed output directory of example programs from being relative to the
-  CMAKE_SOURCE_DIR to being in CMAKE_BINARY_DIR.
+  `CMAKE_SOURCE_DIR` to being in `CMAKE_BINARY_DIR`.
 * Removed extern/glfw-3.0.4/ - users are now responsible for providing glfw3.
 * Removing Khronos header files, in order to ensure system-supplied versions
   are used instead.
