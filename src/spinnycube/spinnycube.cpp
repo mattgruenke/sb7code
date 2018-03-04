@@ -21,24 +21,39 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <oglplus/gl.hpp>
+#include <oglplus/all.hpp>
+#include "oglplus/example.hpp"
+
 #include <sb7.h>
 #include <vmath.h>
+
 
 // Remove this to draw only a single cube!
 // #define MANY_CUBES
 
-class singlepoint_app : public sb7::application
+
+using namespace oglplus;
+
+
+
+Mat4f Convert(const vmath::mat4 &m)
 {
-    void init()
+    Mat4f result;
+    for (int j = 0; j < 4; j++)
     {
-        static const char title[] = "OpenGL SuperBible - Spinny Cube";
-
-        sb7::application::init();
-
-        memcpy(info.title, title, sizeof(title));
+        for (int i = 0; i < 4; i++) result.Set(i, j, m[j][i]);
     }
+    return result;
+}
 
-    virtual void startup()
+
+class singlepoint_app : public Example
+{
+public:
+    singlepoint_app()
+    : mv_location(program),
+      proj_location(program)
     {
         static const char * vs_source[] =
         {
@@ -78,25 +93,21 @@ class singlepoint_app : public sb7::application
             "}                                                                  \n"
         };
 
-        program = glCreateProgram();
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, fs_source, NULL);
-        glCompileShader(fs);
+        FragmentShader  fs;
+        fs.Source(fs_source).Compile();
 
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, vs_source, NULL);
-        glCompileShader(vs);
+        VertexShader    vs;
+        vs.Source(vs_source).Compile();
 
-        glAttachShader(program, vs);
-        glAttachShader(program, fs);
+        program.AttachShader(vs);
+        program.AttachShader(fs);
 
-        glLinkProgram(program);
+        program.Link().Use();
 
-        mv_location = glGetUniformLocation(program, "mv_matrix");
-        proj_location = glGetUniformLocation(program, "proj_matrix");
+        mv_location.BindTo("mv_matrix");
+        proj_location.BindTo("proj_matrix");
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        vao.Bind();
 
         static const GLfloat vertex_positions[] =
         {
@@ -149,37 +160,28 @@ class singlepoint_app : public sb7::application
             -0.25f,  0.25f, -0.25f
         };
 
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ARRAY_BUFFER,
-                     sizeof(vertex_positions),
-                     vertex_positions,
-                     GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
+        buffer.Bind(Buffer::Target::Array);
+        Buffer::Data(Buffer::Target::Array, vertex_positions, BufferUsage::StaticDraw);
+        VertexArrayAttrib vaa(program, "position");
+        vaa.Pointer(3, DataType::Float, false, 0, NULL);
+        vaa.Enable();
 
-        glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CW);
+        gl.Enable(Capability::CullFace);
+        gl.FrontFace(FaceOrientation::CW);
 
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        
-        onResize(info.windowWidth, info.windowHeight);
+        gl.Enable(Capability::DepthTest);
+        gl.DepthFunc(CompareFunction::LEqual);
     }
 
-    virtual void render(double currentTime)
+    virtual void Render(double currentTime)
     {
         static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
         static const GLfloat one = 1.0f;
 
-        glViewport(0, 0, info.windowWidth, info.windowHeight);
-        glClearBufferfv(GL_COLOR, 0, green);
-        glClearBufferfv(GL_DEPTH, 0, &one);
+        gl.ClearColorBuffer(0, green);
+        gl.ClearDepthBuffer(one);
 
-        glUseProgram(program);
-
-        glUniformMatrix4fv(proj_location, 1, GL_FALSE, proj_matrix);
-
+        proj_location.Set(Convert(proj_matrix));
 #ifdef MANY_CUBES
         int i;
         for (i = 0; i < 24; i++)
@@ -191,8 +193,8 @@ class singlepoint_app : public sb7::application
                                     vmath::translate(sinf(2.1f * f) * 2.0f,
                                                      cosf(1.7f * f) * 2.0f,
                                                      sinf(1.3f * f) * cosf(1.5f * f) * 2.0f);
-            glUniformMatrix4fv(mv_location, 1, GL_FALSE, mv_matrix);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            mv_location.Set(Convert(mv_matrix));
+            gl.DrawArrays(PrimitiveType::Triangles, 0, 36);
         }
 #else
         float f = (float)currentTime * 0.3f;
@@ -202,35 +204,42 @@ class singlepoint_app : public sb7::application
                                                     sinf(1.3f * f) * cosf(1.5f * f) * 2.0f) *
                                 vmath::rotate((float)currentTime * 45.0f, 0.0f, 1.0f, 0.0f) *
                                 vmath::rotate((float)currentTime * 81.0f, 1.0f, 0.0f, 0.0f);
-        glUniformMatrix4fv(mv_location, 1, GL_FALSE, mv_matrix);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        mv_location.Set(Convert(mv_matrix));
+        gl.DrawArrays(PrimitiveType::Triangles, 0, 36);
 #endif
     }
 
-    virtual void shutdown()
+    virtual void Reshape(GLuint w, GLuint h)
     {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteProgram(program);
-        glDeleteBuffers(1, &buffer);
-    }
-
-    void onResize(int w, int h)
-    {
-        sb7::application::onResize(w, h);
-
         aspect = (float)w / (float)h;
         proj_matrix = vmath::perspective(50.0f, aspect, 0.1f, 1000.0f);
+        gl.Viewport(w, h);
     }
 
 private:
-    GLuint          program;
-    GLuint          vao;
-    GLuint          buffer;
-    GLint           mv_location;
-    GLint           proj_location;
+    Context                 gl;
+    Program                 program;
+    VertexArray             vao;
 
-    float           aspect;
-    vmath::mat4     proj_matrix;
+    Buffer                  buffer;
+    ProgramUniform<Mat4f>   mv_location;
+    ProgramUniform<Mat4f>   proj_location;
+
+    float                   aspect;
+    vmath::mat4             proj_matrix;
 };
 
-DECLARE_MAIN(singlepoint_app)
+
+const char *oglplus::title = "OpenGL SuperBible - Spinny Cube";
+
+
+void oglplus::setupExample(ExampleParams &)
+{
+}
+
+
+std::unique_ptr<Example> oglplus::makeExample(const ExampleParams &)
+{
+    return std::unique_ptr<Example>(new singlepoint_app);
+}
+
