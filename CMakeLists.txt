@@ -64,6 +64,7 @@ set(EXAMPLES_PLUS
   simpleclear
   singlepoint
   singletri
+  spinnycube
   tessellatedtri
 )
 
@@ -134,7 +135,6 @@ set(EXAMPLES
   simpletexcoords
   simpletexture
   sparsetexture
-  spinnycube
   springmass
   ssao
   starfield
