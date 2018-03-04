@@ -15,11 +15,19 @@ For the original example source, see:
 
 > https://github.com/openglsuperbible/sb7code
 
-For more on OGLplus (warning: the online doxygen docs are currently
-out-of-date), see:
+For more on OGLplus, see:
 
 > http://oglplus.org
+
 > https://github.com/matus-chochlik/oglplus
+
+Note the Quickbook docs are particularly useful.  The tutorials are also worth
+a look, however the Doxygen is currently out-of-date and significantly hampered
+by all the macro-driven template instantiation and specialization):
+
+> http://matus-chochlik.github.io/oglplus/doc/oglplus.html
+
+> http://oglplus.org/oglplus/html/oglplus\_tutorials.html
 
 
 ## Porting Status ##
