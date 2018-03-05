@@ -25,27 +25,12 @@
 #include <oglplus/all.hpp>
 #include "oglplus/example.hpp"
 
-#include <sb7.h>
-#include <vmath.h>
-
 
 // Remove this to draw only a single cube!
 // #define MANY_CUBES
 
 
 using namespace oglplus;
-
-
-
-Mat4f Convert(const vmath::mat4 &m)
-{
-    Mat4f result;
-    for (int j = 0; j < 4; j++)
-    {
-        for (int i = 0; i < 4; i++) result.Set(i, j, m[j][i]);
-    }
-    return result;
-}
 
 
 class singlepoint_app : public Example
@@ -181,7 +166,7 @@ public:
         gl.ClearColorBuffer(0, green);
         gl.ClearDepthBuffer(one);
 
-        proj_location.Set(Convert(proj_matrix));
+        proj_location.Set(proj_matrix);
 #ifdef MANY_CUBES
         int i;
         for (i = 0; i < 24; i++)
@@ -211,8 +196,18 @@ public:
 
     virtual void Reshape(GLuint w, GLuint h)
     {
-        aspect = (float)w / (float)h;
-        proj_matrix = vmath::perspective(50.0f, aspect, 0.1f, 1000.0f);
+        // Parameters to vmath::perspective():
+        float fovy = 50.0f;
+        float aspect = (float)w / (float)h;
+        float n = 0.1f;
+        float f = 1000.0;
+
+        // Convert to viewport parameters for CameraMatrix<>::Perspective():
+        float fovy_rad = fovy * (float)(M_PI / 180.0);
+        float vh = tanf(0.5f * fovy_rad) * 2.0f * n;
+        float vw  = aspect * vh;
+        proj_matrix = CamMatrixf::Perspective( -vw/2, vw/2, -vh/2, vh/2, n, f );
+
         gl.Viewport(w, h);
     }
 
@@ -225,8 +220,7 @@ private:
     ProgramUniform<Mat4f>   mv_location;
     ProgramUniform<Mat4f>   proj_location;
 
-    float                   aspect;
-    vmath::mat4             proj_matrix;
+    CamMatrixf              proj_matrix;
 };
 
 
