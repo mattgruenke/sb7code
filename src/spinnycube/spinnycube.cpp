@@ -187,24 +187,24 @@ public:
         for (i = 0; i < 24; i++)
         {
             float f = (float)i + (float)currentTime * 0.3f;
-            vmath::mat4 mv_matrix = vmath::translate(0.0f, 0.0f, -6.0f) *
-                                    vmath::rotate((float)currentTime * 45.0f, 0.0f, 1.0f, 0.0f) *
-                                    vmath::rotate((float)currentTime * 21.0f, 1.0f, 0.0f, 0.0f) *
-                                    vmath::translate(sinf(2.1f * f) * 2.0f,
-                                                     cosf(1.7f * f) * 2.0f,
-                                                     sinf(1.3f * f) * cosf(1.5f * f) * 2.0f);
-            mv_location.Set(Convert(mv_matrix));
+            ModelMatrixf mv_matrix = ModelMatrixf::Translation(0.0f, 0.0f, -6.0f) *
+                ModelMatrixf::RotationA(Vec3f(0.0f, 1.0f, 0.0f), Anglef::Degrees((float)currentTime * 45.0f)) *
+                ModelMatrixf::RotationA(Vec3f(1.0f, 0.0f, 0.0f), Anglef::Degrees((float)currentTime * 21.0f)) *
+                ModelMatrixf::Translation(sinf(2.1f * f) * 2.0f,
+                                          cosf(1.7f * f) * 2.0f,
+                                          sinf(1.3f * f) * cosf(1.5f * f) * 2.0f);
+            mv_location.Set(mv_matrix);
             gl.DrawArrays(PrimitiveType::Triangles, 0, 36);
         }
 #else
         float f = (float)currentTime * 0.3f;
-        vmath::mat4 mv_matrix = vmath::translate(0.0f, 0.0f, -4.0f) *
-                                vmath::translate(sinf(2.1f * f) * 0.5f,
-                                                    cosf(1.7f * f) * 0.5f,
-                                                    sinf(1.3f * f) * cosf(1.5f * f) * 2.0f) *
-                                vmath::rotate((float)currentTime * 45.0f, 0.0f, 1.0f, 0.0f) *
-                                vmath::rotate((float)currentTime * 81.0f, 1.0f, 0.0f, 0.0f);
-        mv_location.Set(Convert(mv_matrix));
+        ModelMatrixf mv_matrix = ModelMatrixf::Translation(0.0f, 0.0f, -4.0f) *
+            ModelMatrixf::Translation(sinf(2.1f * f) * 0.5f,
+                                      cosf(1.7f * f) * 0.5f,
+                                      sinf(1.3f * f) * cosf(1.5f * f) * 2.0f) *
+            ModelMatrixf::RotationA(Vec3f(0.0f, 1.0f, 0.0f), Anglef::Degrees((float)currentTime * 45.0f)) *
+            ModelMatrixf::RotationA(Vec3f(1.0f, 0.0f, 0.0f), Anglef::Degrees((float)currentTime * 81.0f)) ;
+        mv_location.Set(mv_matrix);
         gl.DrawArrays(PrimitiveType::Triangles, 0, 36);
 #endif
     }
