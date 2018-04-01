@@ -77,6 +77,9 @@ arvhive and issue:
 
 The examples will build into the 'bin' directory.
 
+For degging, append -DCMAKE_BUILD_TYPE=Debug to cmake and use the executables
+with the _d suffix.
+
 Other platforms
 ---------------
 
