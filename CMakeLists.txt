@@ -62,6 +62,7 @@ set(RUN_DIR ${PROJECT_BINARY_DIR}/bin)
 set(EXAMPLES_PLUS
   movingtri
   simpleclear
+  simpletexture
   singlepoint
   singletri
   spinnycube
@@ -133,7 +134,6 @@ set(EXAMPLES
   shadowmapping
   shapedpoints
   simpletexcoords
-  simpletexture
   sparsetexture
   springmass
   ssao

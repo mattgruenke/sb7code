@@ -21,26 +21,21 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <sb7.h>
 #include <vmath.h>
 
 #include <string>
-static void print_shader_log(GLuint shader)
-{
-    std::string str;
-    GLint len;
 
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
-    if (len != 0)
-    {
-        str.resize(len);
-        glGetShaderInfoLog(shader, len, NULL, &str[0]);
-    }
+#include <oglplus/gl.hpp>
+#include <oglplus/all.hpp>
+#include <oglplus/opt/smart_enums.hpp>
+#include <oglplus/bound/texture.hpp>
 
-#ifdef _WIN32
-    OutputDebugStringA(str.c_str());
-#endif
-}
+#include "oglplus/example.hpp"
+
+
+
+using namespace oglplus;
+
 
 static const char * vs_source[] =
 {
@@ -70,85 +65,66 @@ static const char * fs_source[] =
     "}                                                                              \n"
 };
 
-class simpletexture_app : public sb7::application
+class simpletexture_app : public Example
 {
 public:
-    void init()
+    simpletexture_app()
     {
-        static const char title[] = "OpenGL SuperBible - Simple Texturing";
-
-        sb7::application::init();
-
-        memcpy(info.title, title, sizeof(title));
-    }
-
-    void startup(void)
-    {
-        // Generate a name for the texture
-        glGenTextures(1, &texture);
-
-        // Now bind it to the context using the GL_TEXTURE_2D binding point
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        // Specify the amount of storage we want to use for the texture
-        glTexStorage2D(GL_TEXTURE_2D,   // 2D texture
-                       8,               // 8 mipmap levels
-                       GL_RGBA32F,      // 32-bit floating-point RGBA data
-                       256, 256);       // 256 x 256 texels
-
         // Define some data to upload into the texture
         float * data = new float[256 * 256 * 4];
 
         // generate_texture() is a function that fills memory with image data
         generate_texture(data, 256, 256);
 
+        // Now bind it to the context using the GL_TEXTURE_2D binding point
+        gl.Bound(smart_values::_2D, texture)
+
+        // Specify the amount of storage we want to use for the texture
+        .Storage2D(
+            8,                                  // 8 mipmap levels
+            PixelDataInternalFormat::RGBA32F,   // 32-bit floating-point RGBA data
+            256, 256)                           // 256 x 256 texels
+
         // Assume the texture is already bound to the GL_TEXTURE_2D target
-        glTexSubImage2D(GL_TEXTURE_2D,  // 2D texture
-                        0,              // Level 0
-                        0, 0,           // Offset 0, 0
-                        256, 256,       // 256 x 256 texels, replace entire image
-                        GL_RGBA,        // Four channel data
-                        GL_FLOAT,       // Floating point data
-                        data);          // Pointer to data
+        .SubImage2D(
+            0,                          // Level 0
+            0, 0,                       // Offset 0, 0
+            256, 256,                   // 256 x 256 texels, replace entire image
+            PixelDataFormat::RGBA,      // Four channel data
+            PixelDataType::Float,       // Floating point data
+            data);                      // Pointer to data
 
         // Free the memory we allocated before - \GL now has our data
         delete [] data;
 
-        program = glCreateProgram();
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, fs_source, NULL);
-        glCompileShader(fs);
+        FragmentShader  fs;
+        fs.Source(fs_source).Compile();
 
-        print_shader_log(fs);
+        std::cout << fs.GetInfoLog() << std::endl;
 
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, vs_source, NULL);
-        glCompileShader(vs);
+        VertexShader    vs;
+        vs.Source(vs_source).Compile();
 
-        print_shader_log(vs);
+        std::cout << vs.GetInfoLog() << std::endl;
 
-        glAttachShader(program, vs);
-        glAttachShader(program, fs);
+        program.AttachShader(vs);
+        program.AttachShader(fs);
 
-        glLinkProgram(program);
+        program.Link().Use();
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        vao.Bind();
     }
 
-    void shutdown(void)
+    virtual void Reshape(GLuint width, GLuint height)
     {
-        glDeleteProgram(program);
-        glDeleteVertexArrays(1, &vao);
-        glDeleteTextures(1, &texture);
+        gl.Viewport(width, height);
     }
 
-    void render(double t)
+    virtual void Render(double t)
     {
         static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
         glClearBufferfv(GL_COLOR, 0, green);
 
-        glUseProgram(program);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
@@ -170,9 +146,23 @@ private:
     }
 
 private:
-    GLuint      texture;
-    GLuint      program;
-    GLuint      vao;
+    Context         gl;
+    Program         program;
+    VertexArray     vao;
+    Texture         texture;
 };
 
-DECLARE_MAIN(simpletexture_app);
+
+const char *oglplus::title = "OpenGL SuperBible - Simple Texturing";
+
+
+void oglplus::setupExample(ExampleParams &)
+{
+}
+
+
+std::unique_ptr<Example> oglplus::makeExample(const ExampleParams &)
+{
+    return std::unique_ptr<Example>(new simpletexture_app);
+}
+
